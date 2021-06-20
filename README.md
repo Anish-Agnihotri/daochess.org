@@ -23,3 +23,22 @@ Requires:
 
 9. Win condition
    At win, finalize game and embody on historic games page
+
+Not Authenticated
+Don't allow any actions
+Authenticated but no tokens of playing side
+Don't allow any actions
+Authenticated and tokens of playing side
+Voting period
+Voted
+Don't allow any actions
+Show selected vote
+Not Voted
+Allow moving pieces on board
+Allow submitting vote and refreshing
+Allow voting for existing vote
+Post-voting period
+No proposed moves
+Voting period, not voted state w/ automatic finalization
+W/ proposed moves
+Show finalization button

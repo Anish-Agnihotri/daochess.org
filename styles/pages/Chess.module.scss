@@ -1,0 +1,21 @@
+.chess__board {
+  background-color: rgb(250, 250, 250);
+  border-bottom: 1px solid rgb(238, 238, 240);
+  padding: 50px 0px;
+  text-align: center;
+
+  div {
+    margin: 0px auto;
+  }
+}
+
+.chess__details {
+  padding: 20px 0px;
+}
+
+.chess__details_card {
+  padding: 16px 24px;
+  border-radius: 10px;
+  margin: 20px 0px;
+  border: 1px solid rgb(238, 238, 240);
+}
