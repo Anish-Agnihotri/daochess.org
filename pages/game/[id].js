@@ -9,8 +9,10 @@ import axios from "axios";
 
 const Chessboard = dynamic(() => import("chessboardjsx"), { ssr: false });
 
-export default function Game({ game }) {
+export default function Game({ game: retrievedGame }) {
+  const [game, setGame] = useState(retrievedGame);
   const [votes, setVotes] = useState(null);
+  const [newFen, setNewFen] = useState("");
   const [loading, setLoading] = useState(false);
   const { rawAddress } = eth.useContainer();
 
@@ -55,6 +57,31 @@ export default function Game({ game }) {
     }
   };
 
+  const submitVote = async () => {
+    try {
+      const response = await axios.post("/api/games/vote", {
+        id: game.id,
+        fen: newFen,
+        address: rawAddress,
+        sig: "smth",
+      });
+      setGame(response.data.game);
+    } catch (error) {
+      console.log(error.response.data.error);
+    }
+  };
+
+  const finalizeTurn = async () => {
+    try {
+      const response = await axios.post("/api/games/finalize", {
+        id: game.id,
+      });
+      setGame(response.data.game);
+    } catch (error) {
+      console.log(error.response.data.error);
+    }
+  };
+
   useEffect(checkAddressVotes, [rawAddress]);
 
   return (
@@ -68,8 +95,28 @@ export default function Game({ game }) {
 
         <div className={styles.chess__details}>
           <div className="sizer">
+            <h3>Turn Details</h3>
             <div className={styles.chess__details_card}>
               <span>Votes at snapshot: {loading ? "Loading" : votes}</span>
+            </div>
+
+            <div className={styles.chess__details_card}>
+              <span>New FEN</span>
+              {Math.round(Date.now() / 1000) > game.turn_over &&
+              game.current.proposed_moves.length > 0 ? (
+                <>
+                  <button onClick={finalizeTurn}>Finalize turn</button>
+                </>
+              ) : (
+                <>
+                  <input
+                    type="text"
+                    value={newFen}
+                    onChange={(e) => setNewFen(e.target.value)}
+                  />
+                  <button onClick={submitVote}>Submit</button>
+                </>
+              )}
             </div>
 
             <span>Game {JSON.stringify(game)}</span>
@@ -85,6 +132,7 @@ export default function Game({ game }) {
               <CurrentRoundVotes votes={game.current.votes} />
             </div>
 
+            <h3>Historic Moves</h3>
             <div className={styles.chess__details_card}>
               <HistoricMovesTable moves={game.historic_moves} />
             </div>
@@ -116,7 +164,14 @@ function HistoricMovesTable({ moves }) {
     { Header: "Move", accessor: "move" },
   ];
 
-  return <ReactTable data={moves} columns={historicMovesColumns} />;
+  return (
+    <ReactTable
+      data={moves}
+      columns={historicMovesColumns}
+      pageSize={moves.length}
+      showPagination={false}
+    />
+  );
 }
 
 export async function getServerSideProps({ params: { id } }) {
