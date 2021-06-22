@@ -3,6 +3,7 @@ import { collectGameById } from "./collect";
 import fleekStorage from "@fleekhq/fleek-storage-js";
 import { fleekAuth } from "utils/ethers";
 import { Chess } from "chess.js";
+import { recoverPersonalSignature } from "eth-sig-util";
 
 export default async (req, res) => {
   const { id, move, address, sig } = req.body;
@@ -27,6 +28,11 @@ export default async (req, res) => {
   }
 
   // Check if signature matches with fen + address
+  const decodedAddress = recoverPersonalSignature({ data: move, sig: sig });
+  console.log(decodedAddress);
+  if (address.toLowerCase() !== decodedAddress.toLowerCase()) {
+    return res.status(500).send({ error: "Incorrect signature." });
+  }
 
   // Check if address has balance to vote for current team
   const playingTeam =

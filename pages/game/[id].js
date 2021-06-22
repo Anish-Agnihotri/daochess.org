@@ -6,6 +6,7 @@ import eth from "@state/eth";
 import { useState, useEffect } from "react";
 import ReactTable from "react-table-6";
 import axios from "axios";
+import { bufferToHex } from "ethereumjs-util";
 
 const Chessboard = dynamic(() => import("chessboardjsx"), { ssr: false });
 
@@ -14,7 +15,7 @@ export default function Game({ game: retrievedGame }) {
   const [votes, setVotes] = useState(null);
   const [newMove, setNewMove] = useState("");
   const [loading, setLoading] = useState(false);
-  const { rawAddress } = eth.useContainer();
+  const { provider, rawAddress } = eth.useContainer();
 
   // Utility methods
   const isAuthed = !!rawAddress;
@@ -55,17 +56,28 @@ export default function Game({ game: retrievedGame }) {
     }
   };
 
-  const submitVote = async (fen) => {
+  const submitVote = async () => {
+    let signature;
     try {
-      const response = await axios.post("/api/games/vote", {
-        id: game.id,
-        move: newMove,
-        address: rawAddress,
-        sig: "smth",
-      });
-      setGame(response.data.game);
+      const msg = bufferToHex(Buffer.from(newMove, "utf8"));
+      signature = await provider.send("personal_sign", [msg, rawAddress]);
     } catch (error) {
-      console.log(error.response.data.error);
+      console.log(error);
+    }
+
+    console.log(signature);
+    if (signature) {
+      try {
+        const response = await axios.post("/api/games/vote", {
+          id: game.id,
+          move: newMove,
+          address: rawAddress,
+          sig: signature,
+        });
+        setGame(response.data.game);
+      } catch (error) {
+        console.log(error.response.data.error);
+      }
     }
   };
 

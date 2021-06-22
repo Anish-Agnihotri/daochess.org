@@ -40,7 +40,7 @@ export default async (req, res) => {
   newGame.move++;
   newGame.turn_over = Math.round(Date.now() / 1000) + 60 * game.timeout;
   const board = new Chess(game.fen);
-  board.move(bestProposedMove.move);
+  board.move(bestProposedMove.move, { sloppy: true });
   newGame.fen = board.fen();
   newGame.current.proposed_moves = [];
   newGame.current.voters = [];
