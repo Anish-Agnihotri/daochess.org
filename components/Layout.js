@@ -1,8 +1,8 @@
 import Head from "next/head";
 import Link from "next/link";
-import styles from "@styles/components/Layout.module.scss";
+import styles from "styles/components/Layout.module.scss";
 import NextNProgress from "nextjs-progressbar"; // Navigation progress bar
-import eth from "@state/eth";
+import state from "utils/state";
 import Jazzicon, { jsNumberForAddress } from "react-jazzicon";
 
 export default function Layout({ children }) {
@@ -42,7 +42,7 @@ function Meta() {
 }
 
 function Header() {
-  const { address, unlock } = eth.useContainer();
+  const { address, unlock } = state.useContainer();
 
   return (
     <div className={styles.layout__header}>

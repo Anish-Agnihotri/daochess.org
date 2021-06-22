@@ -1,4 +1,3 @@
-import chess from "@state/chess";
 import Layout from "components/Layout";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -6,28 +5,33 @@ import Loader from "react-loader-spinner";
 import styles from "styles/pages/Home.module.scss";
 import ReactTable from "react-table-6";
 import dayjs from "dayjs";
+import axios from "axios";
+import { toast } from "react-toastify";
 
 export default function Home() {
-  const [loading, setLoading] = useState(true);
-  const [games, setGames] = useState([]);
-  const { getAllGames } = chess.useContainer();
+  const [games, setGames] = useState([]); // All daochess games
+  const [loading, setLoading] = useState(true); // Loading page state
 
-  const getGamesWithLoading = async () => {
-    setLoading(true);
-    const retrievedGames = await getAllGames();
-    setGames(retrievedGames);
-    setLoading(false);
+  /**
+   * Collects and stores daochess games
+   */
+  const getGames = async () => {
+    setLoading(true); // Toggle loading
+
+    // Collect and store games
+    try {
+      const response = await axios.get("/api/games/list");
+      setGames(response.data);
+    } catch {
+      toast.error("Error: could not collect games");
+    }
+
+    setLoading(false); // Toggle loading
   };
 
-  useEffect(getGamesWithLoading, []);
+  // Collect games on page load
+  useEffect(getGames, []);
 
-  /*
-		Dao1
-		Dao2
-		Vote timeout
-		Snapshot block
-		Play
-	 */
   const gameTableColumns = [
     {
       Header: "DAO #1",

@@ -12,11 +12,11 @@ const wallets = [
   },
 ];
 
-function useEth() {
-  const [rawAddress, setRawAddress] = useState(null);
+function useETHState() {
   const [address, setAddress] = useState(null); // User address
   const [onboard, setOnboard] = useState(null); // Onboard provider
   const [provider, setProvider] = useState(null); // Ethers provider
+  const [rawAddress, setRawAddress] = useState(null); // Non-ENS address
 
   /**
    * Unlock wallet, store ethers provider and address
@@ -57,11 +57,12 @@ function useEth() {
             // Collect ENS name
             const ensName = await provider.lookupAddress(address);
 
-            // Update provider and address
+            // Update provider, address, and raw address
             setProvider(provider);
             setRawAddress(address);
             setAddress(ensName ? ensName : address);
           } else {
+            // Nullify data
             setProvider(null);
             setRawAddress(null);
             setAddress(null);
@@ -85,5 +86,5 @@ function useEth() {
 }
 
 // Create unstated-next container
-const eth = createContainer(useEth);
-export default eth;
+const state = createContainer(useETHState);
+export default state;

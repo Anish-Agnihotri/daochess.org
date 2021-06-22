@@ -2,7 +2,7 @@ import Layout from "components/layout";
 import { collectGameById } from "pages/api/games/collect";
 import styles from "styles/pages/Chess.module.scss";
 import dynamic from "next/dynamic";
-import eth from "@state/eth";
+import state from "utils/state";
 import { useState, useEffect } from "react";
 import ReactTable from "react-table-6";
 import axios from "axios";
@@ -15,7 +15,7 @@ export default function Game({ game: retrievedGame }) {
   const [votes, setVotes] = useState(null);
   const [newMove, setNewMove] = useState("");
   const [loading, setLoading] = useState(false);
-  const { provider, rawAddress } = eth.useContainer();
+  const { provider, rawAddress } = state.useContainer();
 
   // Utility methods
   const isAuthed = !!rawAddress;

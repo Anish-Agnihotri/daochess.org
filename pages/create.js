@@ -1,7 +1,6 @@
 import { useState } from "react";
 import Layout from "components/Layout";
 import styles from "styles/pages/Create.module.scss";
-import chess from "@state/chess";
 import { useRouter } from "next/router";
 
 export default function Create() {
@@ -13,23 +12,27 @@ export default function Create() {
   const [timeout, setTimeout] = useState(240);
   const [loading, setLoading] = useState(false);
 
-  const { createGame } = chess.useContainer();
-
-  const createWithLoading = async () => {
+  const createGame = async () => {
     setLoading(true);
+
+    const gameParams = {
+      dao1Name,
+      dao1Address,
+      dao2Name,
+      dao2Address,
+      timeout,
+    };
+
     try {
-      const game_id = await createGame({
-        dao1Name,
-        dao1Address,
-        dao2Name,
-        dao2Address,
-        timeout,
-      });
-      if (game_id) {
-        router.push(`/game/${game_id}`);
+      const response = await axios.post("/api/games/create", gameParams);
+      toast.success("daochess game successfully created.");
+      router.push(`/game/${response.data.id}`);
+    } catch (error) {
+      if (error.response.data.error) {
+        toast.error(`Error: ${error.response.data.error}`);
+      } else {
+        toast.error("Error: unexpected error, please try again.");
       }
-    } catch {
-      setLoading(false);
     }
 
     setLoading(false);
@@ -102,7 +105,7 @@ export default function Create() {
               />
             </div>
 
-            <button onClick={createWithLoading} disabled={loading}>
+            <button onClick={createGame} disabled={loading}>
               {!loading ? "Create game" : "Creating..."}
             </button>
           </div>
