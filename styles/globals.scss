@@ -79,6 +79,24 @@ a {
   }
 }
 
+// Table styling by page
+.home__table {
+  .rt-thead,
+  .rt-tbody {
+    min-width: 620px !important;
+  }
+
+  .rt-td,
+  .rt-th {
+    min-width: 140px !important;
+  }
+
+  .rt-td:nth-last-of-type(1),
+  .rt-th:nth-last-of-type(1) {
+    min-width: 200px !important;
+  }
+}
+
 .sizer {
   max-width: 1024px;
   padding: 0px 16px;

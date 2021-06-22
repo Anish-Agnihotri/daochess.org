@@ -1,81 +1,98 @@
 .create {
-	div {
-		h3 {
-			color: var(--color-black);
-			font-weight: 700;
-			font-size: 32px;
-			line-height: 44px;
-			letter-spacing: -0.03em;
-			margin: 40px 0px 0px 0px;
-		}
+  div {
+    h3 {
+      color: var(--color-black);
+      font-weight: 700;
+      font-size: 32px;
+      line-height: 44px;
+      letter-spacing: -0.03em;
+      margin: 40px 0px 0px 0px;
+    }
 
-		> p {
-			font-size: 16px;
-			font-weight: 400;
-			line-height: 24px;
-			letter-spacing: -0.02em;
-			color: rgb(83, 83, 107);
-			margin-top: 5px;
-		}
-	}
+    > p {
+      font-size: 16px;
+      font-weight: 400;
+      line-height: 24px;
+      letter-spacing: -0.02em;
+      color: rgb(83, 83, 107);
+      margin-top: 5px;
+    }
+  }
 
-	.create__form {
-		padding: 16px 24px;
-		border-radius: 10px;
-		border: 1px solid rgb(238, 238, 240);
-		box-shadow: rgb(0 0 0 / 0%) 0px 10px 20px, rgb(0 0 0 / 0%) 0px 2px 6px,
-			rgb(0 0 0 / 0%) 0px 0px 1px;
-		margin: 30px 0px;
+  .create__form {
+    padding: 16px 24px;
+    border-radius: 10px;
+    border: 1px solid rgb(238, 238, 240);
+    box-shadow: rgb(0 0 0 / 0%) 0px 10px 20px, rgb(0 0 0 / 0%) 0px 2px 6px,
+      rgb(0 0 0 / 0%) 0px 0px 1px;
+    margin: 30px 0px;
 
-		div {
-			padding: 10px 0px;
+    div {
+      padding: 10px 0px;
 
-			h4 {
-				margin: 0px;
-				color: var(--color-black);
-				font-size: 18px;
-				letter-spacing: -0.01em;
-			}
+      h4 {
+        margin: 0px;
+        color: var(--color-black);
+        font-size: 18px;
+        letter-spacing: -0.01em;
+      }
 
-			span {
-				font-size: 15px;
-				font-weight: 400;
-				line-height: 20px;
-				color: rgb(83, 83, 107);
-				display: block;
-				margin-top: 5px;
-			}
+      span {
+        font-size: 15px;
+        font-weight: 400;
+        line-height: 20px;
+        color: rgb(83, 83, 107);
+        display: block;
+        margin-top: 5px;
+      }
 
-			input {
-				display: block;
-				width: 100%;
-				margin: 10px 0px;
-				background-color: white;
-				padding: 10px 0px 10px 10px;
-				border: 1px solid rgb(208, 208, 208);
-				border-radius: 5px;
-				font-size: 16px;
-			}
-		}
+      input {
+        display: block;
+        width: 100%;
+        margin: 10px 0px;
+        background-color: white;
+        padding: 10px 0px 10px 10px;
+        border: 1px solid rgb(208, 208, 208);
+        border-radius: 5px;
+        font-size: 16px;
+      }
+    }
 
-		button {
-			border: none;
-			background-color: var(--color-black);
-			color: white;
-			width: 100%;
-			padding: 15px 0px;
-			display: block;
-			font-size: 16px;
-			text-align: center;
-			font-weight: 600;
-			line-height: 20px;
-			letter-spacing: -0.01em;
-			transition: 120ms ease;
-			border-radius: 8px;
+    button {
+      border: none;
+      background-color: var(--color-black);
+      color: white;
+      width: 100%;
+      padding: 15px 0px;
+      display: block;
+      font-size: 16px;
+      text-align: center;
+      font-weight: 600;
+      line-height: 20px;
+      letter-spacing: -0.01em;
+      transition: 120ms ease;
+      border-radius: 8px;
 
-			&:hover {
-				opacity: 0.9;
-			}
-		}
-	}
+      &:hover {
+        opacity: 0.9;
+      }
+    }
+  }
+}
+
+@media screen and (max-width: 700px) {
+  .create {
+    div {
+      h3 {
+        font-size: 24px;
+        line-height: 30px;
+        margin: 30px 0px 0px 0px;
+      }
+
+      p {
+        font-size: 15px;
+        line-height: 22px;
+      }
+    }
+  }
 }

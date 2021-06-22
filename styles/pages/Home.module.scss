@@ -122,3 +122,29 @@
     }
   }
 }
+
+@media screen and (max-width: 700px) {
+  .home__capture {
+    div {
+      h3 {
+        font-size: 26px;
+        line-height: 32px;
+      }
+
+      p {
+        font-size: 16px;
+        line-height: 22px;
+        margin: 5px auto 40px auto;
+      }
+    }
+  }
+
+  .home {
+    padding: 30px 0px;
+
+    h4 {
+      font-size: 18px;
+      line-height: 22px;
+    }
+  }
+}

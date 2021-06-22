@@ -103,7 +103,9 @@ export default function Game({ game: retrievedGame }) {
               <img
                 height="50"
                 width="50"
-                src={game.dao1.white ? "/white.png" : "/black.png"}
+                src={
+                  game.dao1.white ? "/images/white.png" : "/images/black.png"
+                }
                 alt="Color"
               />{" "}
               {game.dao1.name}
@@ -113,7 +115,9 @@ export default function Game({ game: retrievedGame }) {
               <img
                 height="50"
                 width="50"
-                src={game.dao2.white ? "/white.png" : "/black.png"}
+                src={
+                  game.dao2.white ? "/images/white.png" : "/images/black.png"
+                }
                 alt="Color"
               />{" "}
               {game.dao2.name}

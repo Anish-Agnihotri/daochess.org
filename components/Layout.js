@@ -1,9 +1,9 @@
-import Head from "next/head";
-import Link from "next/link";
-import styles from "styles/components/Layout.module.scss";
+import Head from "next/head"; // Head + meta
+import Link from "next/link"; // Routing
+import state from "utils/state"; // Global state
 import NextNProgress from "nextjs-progressbar"; // Navigation progress bar
-import state from "utils/state";
-import Jazzicon, { jsNumberForAddress } from "react-jazzicon";
+import styles from "styles/components/Layout.module.scss"; // Component styles
+import Jazzicon, { jsNumberForAddress } from "react-jazzicon"; // Address avatar
 
 export default function Layout({ children }) {
   return (
@@ -19,19 +19,24 @@ export default function Layout({ children }) {
         }}
       />
 
+      {/* HTML Meta + Header */}
       <Meta />
       <Header />
 
+      {/* Inject child content */}
       <div className={styles.layout__content}>{children}</div>
 
+      {/* Footer */}
       <Footer />
     </div>
   );
 }
 
+// HTML Head
 function Meta() {
   return (
     <Head>
+      {/* Google fonts */}
       <link rel="preconnect" href="https://fonts.gstatic.com" />
       <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"
@@ -41,23 +46,30 @@ function Meta() {
   );
 }
 
+// Header (+ auth management)
 function Header() {
+  // Collect address and unlock function from global state
   const { address, unlock } = state.useContainer();
 
   return (
     <div className={styles.layout__header}>
       <div className="sizer">
+        {/* Logo */}
         <div>
           <Link href="/">
             <a>
-              <img src="/logo.svg" alt="logo" height="24" width="156" />
+              <img src="/vectors/logo.svg" alt="logo" height="24" width="156" />
             </a>
           </Link>
         </div>
+
+        {/* Auth button */}
         <div>
           <button onClick={unlock}>
             {address ? (
+              // If authenticated
               <>
+                {/* Render address */}
                 <span>
                   {address.startsWith("0x")
                     ? // If ETH address, render truncated address
@@ -67,9 +79,11 @@ function Header() {
                     : // Else, render ENS name
                       address}
                 </span>
+                {/* Render avatar */}
                 <Jazzicon diameter={16} seed={jsNumberForAddress(address)} />
               </>
             ) : (
+              // Else, display Connect Wallet prompt
               "Connect Wallet"
             )}
           </button>
@@ -79,10 +93,12 @@ function Header() {
   );
 }
 
+// Footer
 function Footer() {
   return (
     <div className={styles.layout__footer}>
       <div className="sizer">
+        {/* Credits */}
         <div>
           <span>
             Inspired by{" "}
@@ -104,6 +120,8 @@ function Footer() {
             .
           </span>
         </div>
+
+        {/* Links */}
         <div>
           <ul>
             <li>

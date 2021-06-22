@@ -1,12 +1,12 @@
-import Layout from "components/Layout";
-import Link from "next/link";
-import { useEffect, useState } from "react";
-import Loader from "react-loader-spinner";
-import styles from "styles/pages/Home.module.scss";
-import ReactTable from "react-table-6";
-import dayjs from "dayjs";
-import axios from "axios";
-import { toast } from "react-toastify";
+import dayjs from "dayjs"; // Date parsing
+import axios from "axios"; // Requests
+import Link from "next/link"; // Dynamic routing
+import ReactTable from "react-table-6"; // Table
+import Layout from "components/Layout"; // Component: layout
+import { toast } from "react-toastify"; // Toast notifications
+import Loader from "react-loader-spinner"; // Spinner
+import { useEffect, useState } from "react"; // State management
+import styles from "styles/pages/Home.module.scss"; // Page styles
 
 export default function Home() {
   const [games, setGames] = useState([]); // All daochess games
@@ -32,69 +32,10 @@ export default function Home() {
   // Collect games on page load
   useEffect(getGames, []);
 
-  const gameTableColumns = [
-    {
-      Header: "DAO #1",
-      accessor: "dao1",
-      Cell: (props) => (
-        <span className={styles.home__games_table_dao}>
-          <img
-            width="35"
-            height="35"
-            src={props.value.white ? "white.png" : "black.png"}
-            alt={props.value.white ? "White" : "Black"}
-          />
-          <a
-            href={`https://etherscan.io/address/${props.value.address}`}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            {props.value.name}
-          </a>
-        </span>
-      ),
-    },
-    {
-      Header: "DAO #2",
-      accessor: "dao2",
-      Cell: (props) => (
-        <span className={styles.home__games_table_dao}>
-          <img
-            width="35"
-            height="35"
-            src={props.value.white ? "white.png" : "black.png"}
-            alt={props.value.white ? "White" : "Black"}
-          />
-          <a
-            href={`https://etherscan.io/address/${props.value.address}`}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            {props.value.name}
-          </a>
-        </span>
-      ),
-    },
-    {
-      Header: "Snapshot",
-      accessor: "snapshot_timestamp",
-      Cell: (props) => (
-        <span>{dayjs.unix(props.value).format("MMMM D, YYYY (HH:mm)")}</span>
-      ),
-    },
-    {
-      Header: "Actions",
-      accessor: "id",
-      Cell: (props) => (
-        <Link href={`/game/${props.value}`}>
-          <a className={styles.home__games_table_play}>Play</a>
-        </Link>
-      ),
-    },
-  ];
-
   return (
+    // Wrap page in layout
     <Layout>
+      {/* Capture top CTA */}
       <Capture />
 
       <div className="sizer">
@@ -102,15 +43,18 @@ export default function Home() {
           <h4>All Games</h4>
 
           {!loading ? (
+            // If games have been collected
             games.length > 0 ? (
+              // If games exist, render games in table
               <ReactTable
-                className={styles.home__games_table}
-                columns={gameTableColumns}
                 data={games}
-                pageSize={games.length}
                 showPagination={false}
+                pageSize={games.length}
+                columns={gameTableColumns}
+                className={`${styles.home__games_table} home__table`}
               />
             ) : (
+              // Else, if no games exist, show empty state
               <div className={styles.home__games}>
                 <div className={styles.home__games_empty}>
                   <span>No Games Found</span>
@@ -118,6 +62,7 @@ export default function Home() {
               </div>
             )
           ) : (
+            // Loading state while games are being collected
             <div className={styles.home__games}>
               <center>
                 <Loader type="Oval" color="#007aff" height={50} width={50} />
@@ -125,6 +70,7 @@ export default function Home() {
             </div>
           )}
 
+          {/* Create game button */}
           <Link href="/create">
             <a className={styles.home__create}>Create game</a>
           </Link>
@@ -134,6 +80,10 @@ export default function Home() {
   );
 }
 
+/**
+ * Capture top CTA
+ * @returns {HTMLElement}
+ */
 function Capture() {
   return (
     <div className={styles.home__capture}>
@@ -147,3 +97,73 @@ function Capture() {
     </div>
   );
 }
+
+// Columns for games table
+const gameTableColumns = [
+  // Redirect to game page
+  {
+    Header: "Actions",
+    accessor: "id",
+    Cell: (props) => (
+      <Link href={`/game/${props.value}`}>
+        <a className={styles.home__games_table_play}>Play</a>
+      </Link>
+    ),
+  },
+  // First DAO details
+  {
+    Header: "DAO #1",
+    accessor: "dao1",
+    Cell: (props) => (
+      <span className={styles.home__games_table_dao}>
+        {/* White or black turn */}
+        <img
+          width="35"
+          height="35"
+          src={props.value.white ? "images/white.png" : "images/black.png"}
+          alt={props.value.white ? "White" : "Black"}
+        />
+        {/* Link to token */}
+        <a
+          href={`https://etherscan.io/address/${props.value.address}`}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          {props.value.name}
+        </a>
+      </span>
+    ),
+  },
+  // Second DAO details
+  {
+    Header: "DAO #2",
+    accessor: "dao2",
+    Cell: (props) => (
+      <span className={styles.home__games_table_dao}>
+        {/* White or black turn */}
+        <img
+          width="35"
+          height="35"
+          src={props.value.white ? "images/white.png" : "images/black.png"}
+          alt={props.value.white ? "White" : "Black"}
+        />
+        {/* Link to token */}
+        <a
+          href={`https://etherscan.io/address/${props.value.address}`}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          {props.value.name}
+        </a>
+      </span>
+    ),
+  },
+  // Time of token holder snapshot
+  {
+    Header: "Snapshot",
+    accessor: "snapshot_timestamp",
+    Cell: (props) => (
+      <span>{dayjs.unix(props.value).format("MMMM D, YYYY (HH:mm)")}</span>
+    ),
+  },
+];
