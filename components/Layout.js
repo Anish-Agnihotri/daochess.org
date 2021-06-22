@@ -36,6 +36,40 @@ export default function Layout({ children }) {
 function Meta() {
   return (
     <Head>
+      {/* Primary Meta Tags */}
+      <title>daochess</title>
+      <meta name="title" content="daochess" />
+      <meta
+        name="description"
+        content="daochess pits governance systems against each other in real-time games of Chess, testing mechanisms and coordination."
+      />
+
+      {/* OG + Facebook */}
+      <meta property="og:type" content="website" />
+      <meta property="og:url" content="https://daochess.org/" />
+      <meta property="og:title" content="daochess" />
+      <meta
+        property="og:description"
+        content="daochess pits governance systems against each other in real-time games of Chess, testing mechanisms and coordination."
+      />
+      <meta
+        property="og:image"
+        content="https://daochess.org/images/meta.png"
+      />
+
+      {/* Twitter */}
+      <meta property="twitter:card" content="summary_large_image" />
+      <meta property="twitter:url" content="https://daochess.org/" />
+      <meta property="twitter:title" content="daochess" />
+      <meta
+        property="twitter:description"
+        content="daochess pits governance systems against each other in real-time games of Chess, testing mechanisms and coordination."
+      />
+      <meta
+        property="twitter:image"
+        content="https://daochess.org/images/meta.png"
+      />
+
       {/* Google fonts */}
       <link rel="preconnect" href="https://fonts.gstatic.com" />
       <link
