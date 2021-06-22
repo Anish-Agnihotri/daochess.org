@@ -1,11 +1,14 @@
-import { collectVotesForToken } from "../votes/count";
-import { collectGameById } from "./collect";
-import fleekStorage from "@fleekhq/fleek-storage-js";
-import { fleekAuth } from "utils/ethers";
-import { Chess } from "chess.js";
-import { recoverPersonalSignature } from "eth-sig-util";
+import { Chess } from "chess.js"; // Chess validation engine
+import { fleekAuth } from "utils/ethers"; // Fleek auth object
+import { collectGameById } from "./collect"; // Collection helper
+import fleekStorage from "@fleekhq/fleek-storage-js"; // Fleek
+import { collectVotesForToken } from "../votes/count"; // Collection helper
+import { recoverPersonalSignature } from "eth-sig-util"; // ETH sig utils
+
+// FIXME: can refactor edited game uploads into 1 push instead of two via if/else
 
 export default async (req, res) => {
+  // Collect required parameters
   const { id, move, address, sig } = req.body;
 
   // Check that all parameters are provided
@@ -46,6 +49,7 @@ export default async (req, res) => {
   const votes = await collectVotesForToken(
     address,
     playingTeam.address,
+    playingTeam.decimals,
     game.snapshot_block
   );
   if (votes <= 0) {
@@ -74,10 +78,14 @@ export default async (req, res) => {
   let newGame = game;
   const proposed_moves = game.current.proposed_moves.map((m) => m.move);
   if (proposed_moves.includes(move.toLowerCase())) {
+    // Map each move
     newGame.current.proposed_moves.map((m) => {
+      // If move matches
       if (m.move === move.toLowerCase()) {
+        // Increment vote
         m.votes += votes;
 
+        // Push new voter
         newGame.current.voters.push({
           timestamp: Math.round(Date.now() / 1000),
           voter: address.toLowerCase(),
@@ -89,14 +97,16 @@ export default async (req, res) => {
     });
 
     try {
+      // Upload edited game details
       await fleekStorage.upload({
         ...fleekAuth,
         key: game.id,
         data: JSON.stringify(newGame),
       });
-      return res
-        .status(200)
-        .send({ message: "Incremented existing move vote count." });
+      return res.status(200).send({
+        message: "Incremented existing move vote count.",
+        game: newGame,
+      });
     } catch {
       return res
         .status(500)
@@ -111,6 +121,7 @@ export default async (req, res) => {
       votes: votes,
     });
 
+    // Push new voter to array
     newGame.current.voters.push({
       timestamp: Math.round(Date.now() / 1000),
       voter: address.toLowerCase(),
@@ -118,6 +129,7 @@ export default async (req, res) => {
     });
 
     try {
+      // Upload edited game details
       await fleekStorage.upload({
         ...fleekAuth,
         key: game.id,

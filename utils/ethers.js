@@ -1,7 +1,7 @@
 import { ethers } from "ethers";
 
 const provider = new ethers.providers.JsonRpcProvider(
-  process.env.NEXT_PUBLIC_ARCHIVE_NODE,
+  process.env.ARCHIVE_NODE,
   1
 );
 

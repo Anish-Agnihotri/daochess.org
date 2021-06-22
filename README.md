@@ -1,44 +1,17 @@
-1. Create a game
-   Can only have one active at a time between two DAOs
-   Set max time between moves
-   Takes current block as snapshot window for gov tokens
-   Take most voted option (quadratic voting) after each round
-   Flips back and forth between black/white
+<img src="https://i.imgur.com/mJyYp74.png" width="200">
 
-Requires:
+Inspired by [Dave White](https://twitter.com/_Dave__White_/status/1405694036501954567?s=20).
 
-1. DAO Gov. Token Address #1
-2. DAO Name #1
-3. DAO Gov. Token Address #2
-4. DAO Name #2
-5. Turn timeout
-6. Randomize B/W
-7. Snapshot block take current
+daochess pits governance systems against each other in real-time games of Chess, testing mechanisms and coordination.
 
-8. DAOs
-   Snapshot-styled voting for position
-   Max-voted positions at end of 4-hours are finalized
-   If no positions after 4 hours, keep delaying and select first submitted move
-   You cannot cancel your vote (choose wisely)
+## Run locally
 
-9. Win condition
-   At win, finalize game and embody on historic games page
+Copy `.env.sample` to `.env.local` and edit the environment variables.
 
-Not Authenticated
-Don't allow any actions
-Authenticated but no tokens of playing side
-Don't allow any actions
-Authenticated and tokens of playing side
-Voting period
-Voted
-Don't allow any actions
-Show selected vote
-Not Voted
-Allow moving pieces on board
-Allow submitting vote and refreshing
-Allow voting for existing vote
-Post-voting period
-No proposed moves
-Voting period, not voted state w/ automatic finalization
-W/ proposed moves
-Show finalization button
+```bash
+# Install dependencies
+yarn
+
+# Run development environment
+yarn dev
+```

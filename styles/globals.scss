@@ -97,6 +97,52 @@ a {
   }
 }
 
+.proposed__table {
+  .rt-thead,
+  .rt-tbody {
+    min-width: 900px !important;
+  }
+
+  .rt-td,
+  .rt-th {
+    min-width: 180px !important;
+  }
+}
+
+.voters__table {
+  .rt-thead,
+  .rt-tbody {
+    min-width: 500px !important;
+  }
+
+  .rt-td,
+  .rt-th {
+    min-width: 150px !important;
+  }
+
+  .rt-td:nth-of-type(1),
+  .rt-th:nth-of-type(1) {
+    min-width: 200px !important;
+  }
+}
+
+.historic__table {
+  .rt-thead,
+  .rt-tbody {
+    min-width: 800px !important;
+  }
+
+  .rt-td,
+  .rt-th {
+    min-width: 150px !important;
+  }
+
+  .rt-td:nth-of-type(2),
+  .rt-th:nth-of-type(2) {
+    min-width: 200px !important;
+  }
+}
+
 .sizer {
   max-width: 1024px;
   padding: 0px 16px;

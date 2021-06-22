@@ -1,11 +1,13 @@
-import { collectGameById } from "./collect";
-import fleekStorage from "@fleekhq/fleek-storage-js";
-import { fleekAuth } from "utils/ethers";
-import { Chess } from "chess.js";
+import { Chess } from "chess.js"; // Chess validation engine
+import { fleekAuth } from "utils/ethers"; // Fleek auth object
+import { collectGameById } from "./collect"; // Collection helper
+import fleekStorage from "@fleekhq/fleek-storage-js"; // Fleek
 
 export default async (req, res) => {
+  // Collect required parameters
   const { id } = req.body;
 
+  // Check if parameters exist
   if (!id) {
     res.status(500).send({ error: "Missing parameters." });
   }
@@ -34,14 +36,18 @@ export default async (req, res) => {
   const sortedProposedMoves = game.current.proposed_moves.sort(
     (a, b) => a.votes - b.votes
   );
+  // Collect best move
   const bestProposedMove = sortedProposedMoves[sortedProposedMoves.length - 1];
 
+  // Update game details based on best move
   let newGame = game;
   newGame.move++;
   newGame.turn_over = Math.round(Date.now() / 1000) + 60 * game.timeout;
+  // Collect new fen based on move emulation
   const board = new Chess(game.fen);
   board.move(bestProposedMove.move, { sloppy: true });
   newGame.fen = board.fen();
+  // Reset current move
   newGame.current.proposed_moves = [];
   newGame.current.voters = [];
 
@@ -53,8 +59,9 @@ export default async (req, res) => {
       : game.white === 0
       ? game.dao2
       : game.dao1;
+  // Push new move to historic moves
   newGame.historic_moves.push({
-    white: playingTeam.white,
+    team: playingTeam.name,
     timestamp: bestProposedMove.timestamp,
     proposer: bestProposedMove.proposer,
     votes: bestProposedMove.votes,
@@ -62,6 +69,7 @@ export default async (req, res) => {
   });
 
   try {
+    // Upload new game details
     await fleekStorage.upload({
       ...fleekAuth,
       key: game.id,
