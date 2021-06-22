@@ -63,6 +63,22 @@ a {
   border-bottom: 1px solid rgb(229, 231, 235);
 }
 
+.rt-tbody {
+  border-bottom-left-radius: 11px;
+  border-bottom-right-radius: 11px;
+
+  .rt-tr-group {
+    border-bottom: 1px solid rgb(229, 231, 235);
+  }
+
+  .rt-td {
+    padding: 20px 0px !important;
+    border-right: none !important;
+    background-color: white;
+    text-align: center;
+  }
+}
+
 .sizer {
   max-width: 1024px;
   padding: 0px 16px;

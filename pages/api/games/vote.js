@@ -2,13 +2,14 @@ import { collectVotesForToken } from "../votes/count";
 import { collectGameById } from "./collect";
 import fleekStorage from "@fleekhq/fleek-storage-js";
 import { fleekAuth } from "utils/ethers";
+import { Chess } from "chess.js";
 
 export default async (req, res) => {
-  const { id, fen, address, sig } = req.body;
+  const { id, move, address, sig } = req.body;
 
   // Check that all parameters are provided
-  if (!id || !fen || !address || !sig) {
-    res
+  if (!id || !move || !address || !sig) {
+    return res
       .status(500)
       .send({ error: "Missing required parameters or not authenticated." });
   }
@@ -16,10 +17,14 @@ export default async (req, res) => {
   // Check if game exists
   const game = await collectGameById(id);
   if (!game) {
-    res.status(500).send({ error: "Game does not exist. " });
+    return res.status(500).send({ error: "Game does not exist. " });
   }
 
   // Check if fen move would be valid
+  const currentBoard = new Chess(game.fen);
+  if (!currentBoard.move(move, { sloppy: true })) {
+    return res.status(500).send({ error: "Illegal move." });
+  }
 
   // Check if signature matches with fen + address
 
@@ -38,7 +43,7 @@ export default async (req, res) => {
     game.snapshot_block
   );
   if (votes <= 0) {
-    res.status(500).send({
+    return res.status(500).send({
       error: `Address has 0 voting power at block ${game.snapshot_block}.`,
     });
   }
@@ -46,7 +51,7 @@ export default async (req, res) => {
   // Check if address has already voted
   const voters = game.current.voters.map((e) => e.voter);
   if (voters.includes(address.toLowerCase())) {
-    res
+    return res
       .status(500)
       .send({ error: "Address has already placed vote this turn." });
   }
@@ -54,7 +59,7 @@ export default async (req, res) => {
   // Check if turn time is over and proposal count > 0; if so, prompt finalization
   const current_timestamp = Math.round(Date.now() / 1000);
   if (current_timestamp >= game.turn_over && voters.length > 0) {
-    res.status(500).send({
+    return res.status(500).send({
       error: "Turn time is over with existing proposals. Call finalize. ",
     });
   }
@@ -62,15 +67,15 @@ export default async (req, res) => {
   // Check if vote for move already exists, if so increment vote
   let newGame = game;
   const proposed_moves = game.current.proposed_moves.map((m) => m.move);
-  if (proposed_moves.includes(fen.toLowerCase())) {
+  if (proposed_moves.includes(move.toLowerCase())) {
     newGame.current.proposed_moves.map((m) => {
-      if (m.move === fen.toLowerCase()) {
+      if (m.move === move.toLowerCase()) {
         m.votes += votes;
 
         newGame.current.voters.push({
           timestamp: Math.round(Date.now() / 1000),
           voter: address.toLowerCase(),
-          move: fen.toLowerCase(),
+          move: move.toLowerCase(),
         });
       }
 
@@ -83,25 +88,27 @@ export default async (req, res) => {
         key: game.id,
         data: JSON.stringify(newGame),
       });
-      res
+      return res
         .status(200)
         .send({ message: "Incremented existing move vote count." });
     } catch {
-      res.status(500).send({ error: "Unexpected error when adding vote." });
+      return res
+        .status(500)
+        .send({ error: "Unexpected error when adding vote." });
     }
   } else {
     // If move does not exist, create move and vote
     newGame.current.proposed_moves.push({
       timestamp: Math.round(Date.now() / 1000),
       proposer: address.toLowerCase(),
-      move: fen.toLowerCase(),
+      move: move.toLowerCase(),
       votes: votes,
     });
 
     newGame.current.voters.push({
       timestamp: Math.round(Date.now() / 1000),
       voter: address.toLowerCase(),
-      move: fen.toLowerCase(),
+      move: move.toLowerCase(),
     });
 
     try {
@@ -110,11 +117,11 @@ export default async (req, res) => {
         key: game.id,
         data: JSON.stringify(newGame),
       });
-      res
+      return res
         .status(200)
         .send({ message: "Added new move proposal.", game: newGame });
     } catch {
-      res
+      return res
         .status(500)
         .send({ error: "Unexpected error when adding move proposal." });
     }

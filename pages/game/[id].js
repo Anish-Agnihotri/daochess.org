@@ -12,7 +12,7 @@ const Chessboard = dynamic(() => import("chessboardjsx"), { ssr: false });
 export default function Game({ game: retrievedGame }) {
   const [game, setGame] = useState(retrievedGame);
   const [votes, setVotes] = useState(null);
-  const [newFen, setNewFen] = useState("");
+  const [newMove, setNewMove] = useState("");
   const [loading, setLoading] = useState(false);
   const { rawAddress } = eth.useContainer();
 
@@ -35,8 +35,6 @@ export default function Game({ game: retrievedGame }) {
       ? true
       : false
     : false;
-  console.log("Proposals Exist: ", proposalsExist);
-  console.log("Has voted: ", hasVoted);
 
   const checkAddressVotes = async () => {
     if (isAuthed) {
@@ -57,11 +55,11 @@ export default function Game({ game: retrievedGame }) {
     }
   };
 
-  const submitVote = async () => {
+  const submitVote = async (fen) => {
     try {
       const response = await axios.post("/api/games/vote", {
         id: game.id,
-        fen: newFen,
+        move: newMove,
         address: rawAddress,
         sig: "smth",
       });
@@ -86,7 +84,31 @@ export default function Game({ game: retrievedGame }) {
 
   return (
     <Layout>
-      <div className={styles.chess}>
+      <div>
+        <div className={styles.chess__title}>
+          <h3>
+            <span>
+              <img
+                height="50"
+                width="50"
+                src={game.dao1.white ? "/white.png" : "/black.png"}
+                alt="Color"
+              />{" "}
+              {game.dao1.name}
+            </span>{" "}
+            vs
+            <span>
+              <img
+                height="50"
+                width="50"
+                src={game.dao2.white ? "/white.png" : "/black.png"}
+                alt="Color"
+              />{" "}
+              {game.dao2.name}
+            </span>
+          </h3>
+        </div>
+
         <div className={styles.chess__board}>
           <div className="sizer">
             <Chess fen={game.fen} />
@@ -95,47 +117,67 @@ export default function Game({ game: retrievedGame }) {
 
         <div className={styles.chess__details}>
           <div className="sizer">
-            <h3>Turn Details</h3>
+            <h3>General Details</h3>
             <div className={styles.chess__details_card}>
-              <span>Votes at snapshot: {loading ? "Loading" : votes}</span>
+              <div>
+                <h4>Turn #</h4>
+                <span>{game.move}</span>
+              </div>
+              <div>
+                <h4>Playing DAO</h4>
+                <span>{playingTeam.name}</span>
+              </div>
+              <div>
+                <h4>Token balance snapshot</h4>
+                <span>{game.snapshot_block}</span>
+              </div>
+              <div>
+                <h4>Minutes to timeout</h4>
+                <span>{game.turn_over}</span>
+              </div>
             </div>
 
-            <div className={styles.chess__details_card}>
-              <span>New FEN</span>
-              {Math.round(Date.now() / 1000) > game.turn_over &&
-              game.current.proposed_moves.length > 0 ? (
-                <>
-                  <button onClick={finalizeTurn}>Finalize turn</button>
-                </>
-              ) : (
-                <>
-                  <input
-                    type="text"
-                    value={newFen}
-                    onChange={(e) => setNewFen(e.target.value)}
-                  />
-                  <button onClick={submitVote}>Submit</button>
-                </>
-              )}
-            </div>
+            <h3>User details</h3>
+            {isAuthed ? (
+              <div className={styles.chess__details_card}>
+                <span>Votes at snapshot: {loading ? "Loading" : votes}</span>
+                <span>New Move</span>
+                {Math.round(Date.now() / 1000) > game.turn_over &&
+                game.current.proposed_moves.length > 0 ? (
+                  <>
+                    <button onClick={finalizeTurn}>Finalize turn</button>
+                  </>
+                ) : (
+                  <>
+                    <input
+                      type="text"
+                      value={newMove}
+                      onChange={(e) => setNewMove(e.target.value)}
+                    />
+                    <button onClick={() => submitVote(newMove)}>Submit</button>
+                  </>
+                )}
+              </div>
+            ) : (
+              <div className={styles.chess__details_card}>
+                <span className={styles.empty__table}>
+                  User not authenticated.
+                </span>
+              </div>
+            )}
 
-            <span>Game {JSON.stringify(game)}</span>
+            <h3>Current Round Proposed Moves</h3>
+            <ProposedMovesTable
+              moves={game.current.proposed_moves}
+              voteHandler={submitVote}
+            />
 
-            <div className={styles.chess__details_card}>
-              <ProposedMovesTable
-                moves={game.current.proposed_moves}
-                vote={() => console.log("Vote")}
-              />
-            </div>
-
-            <div className={styles.chess__details_card}>
-              <CurrentRoundVotes votes={game.current.votes} />
-            </div>
+            <h3>Current Round Voters</h3>
+            <CurrentRoundVoters voters={game.current.voters} />
 
             <h3>Historic Moves</h3>
-            <div className={styles.chess__details_card}>
-              <HistoricMovesTable moves={game.historic_moves} />
-            </div>
+
+            <HistoricMovesTable moves={game.historic_moves} />
           </div>
         </div>
       </div>
@@ -147,12 +189,56 @@ function Chess({ fen }) {
   return <Chessboard position={fen} width={400} />;
 }
 
-function ProposedMovesTable({ moves, vote }) {
-  return <span>Proposed Moves</span>;
+function ProposedMovesTable({ moves, voteHandler }) {
+  const movesColumns = [
+    { Header: "Timestamp", accessor: "timestamp" },
+    { Header: "Proposer", accessor: "proposer" },
+    { Header: "Move", accessor: "move" },
+    { Header: "Votes", accessor: "votes" },
+    {
+      Header: "Vote",
+      accessor: "move",
+      Cell: (props) => (
+        <button onClick={() => voteHandler(props.value)}>Vote</button>
+      ),
+    },
+  ];
+
+  return moves.length < 1 ? (
+    <div className={styles.chess__details_card}>
+      <span className={styles.empty__table}>No current round moves found.</span>
+    </div>
+  ) : (
+    <ReactTable
+      data={moves}
+      columns={movesColumns}
+      pageSize={moves.length}
+      showPagination={false}
+    />
+  );
 }
 
-function CurrentRoundVotes({ votes }) {
-  return <span>Votes</span>;
+function CurrentRoundVoters({ voters }) {
+  const votersColumns = [
+    { Header: "Timestamp", accessor: "timestamp" },
+    { Header: "Voter", accessor: "voter" },
+    { Header: "move", accessor: "move" },
+  ];
+
+  return voters.length < 1 ? (
+    <div className={styles.chess__details_card}>
+      <span className={styles.empty__table}>
+        No current round voters found.
+      </span>
+    </div>
+  ) : (
+    <ReactTable
+      data={voters}
+      columns={votersColumns}
+      pageSize={voters.length}
+      showPagination={false}
+    />
+  );
 }
 
 function HistoricMovesTable({ moves }) {
@@ -164,7 +250,11 @@ function HistoricMovesTable({ moves }) {
     { Header: "Move", accessor: "move" },
   ];
 
-  return (
+  return moves.length < 1 ? (
+    <div className={styles.chess__details_card}>
+      <span className={styles.empty__table}>No historic moves found.</span>
+    </div>
+  ) : (
     <ReactTable
       data={moves}
       columns={historicMovesColumns}

@@ -1,6 +1,7 @@
 import { collectGameById } from "./collect";
 import fleekStorage from "@fleekhq/fleek-storage-js";
 import { fleekAuth } from "utils/ethers";
+import { Chess } from "chess.js";
 
 export default async (req, res) => {
   const { id } = req.body;
@@ -38,7 +39,9 @@ export default async (req, res) => {
   let newGame = game;
   newGame.move++;
   newGame.turn_over = Math.round(Date.now() / 1000) + 60 * game.timeout;
-  newGame.fen = bestProposedMove.move;
+  const board = new Chess(game.fen);
+  board.move(bestProposedMove.move);
+  newGame.fen = board.fen();
   newGame.current.proposed_moves = [];
   newGame.current.voters = [];
 

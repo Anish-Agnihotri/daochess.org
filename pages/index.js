@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import Loader from "react-loader-spinner";
 import styles from "styles/pages/Home.module.scss";
 import ReactTable from "react-table-6";
+import dayjs from "dayjs";
 
 export default function Home() {
   const [loading, setLoading] = useState(true);
@@ -28,11 +29,17 @@ export default function Home() {
 		Play
 	 */
   const gameTableColumns = [
-    /*Header: "DAO #1",
+    {
+      Header: "DAO #1",
       accessor: "dao1",
       Cell: (props) => (
-        <span>
-          <img src="/logo.svg" alt="White" />
+        <span className={styles.home__games_table_dao}>
+          <img
+            width="35"
+            height="35"
+            src={props.value.white ? "white.png" : "black.png"}
+            alt={props.value.white ? "White" : "Black"}
+          />
           <a
             href={`https://etherscan.io/address/${props.value.address}`}
             target="_blank"
@@ -41,11 +48,44 @@ export default function Home() {
             {props.value.name}
           </a>
         </span>
-      ),*/
+      ),
+    },
     {
-      Header: "id",
+      Header: "DAO #2",
+      accessor: "dao2",
+      Cell: (props) => (
+        <span className={styles.home__games_table_dao}>
+          <img
+            width="35"
+            height="35"
+            src={props.value.white ? "white.png" : "black.png"}
+            alt={props.value.white ? "White" : "Black"}
+          />
+          <a
+            href={`https://etherscan.io/address/${props.value.address}`}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {props.value.name}
+          </a>
+        </span>
+      ),
+    },
+    {
+      Header: "Snapshot",
+      accessor: "snapshot_timestamp",
+      Cell: (props) => (
+        <span>{dayjs.unix(props.value).format("MMMM D, YYYY (HH:mm)")}</span>
+      ),
+    },
+    {
+      Header: "Actions",
       accessor: "id",
-      Cell: (props) => <Link href={`/game/${props.value}`}>Play</Link>,
+      Cell: (props) => (
+        <Link href={`/game/${props.value}`}>
+          <a className={styles.home__games_table_play}>Play</a>
+        </Link>
+      ),
     },
   ];
 
@@ -57,21 +97,29 @@ export default function Home() {
         <div className={styles.home}>
           <h4>All Games</h4>
 
-          <div className={styles.home__games}>
-            {!loading ? (
-              games.length > 0 ? (
-                <ReactTable columns={gameTableColumns} data={games} />
-              ) : (
+          {!loading ? (
+            games.length > 0 ? (
+              <ReactTable
+                className={styles.home__games_table}
+                columns={gameTableColumns}
+                data={games}
+                pageSize={games.length}
+                showPagination={false}
+              />
+            ) : (
+              <div className={styles.home__games}>
                 <div className={styles.home__games_empty}>
                   <span>No Games Found</span>
                 </div>
-              )
-            ) : (
+              </div>
+            )
+          ) : (
+            <div className={styles.home__games}>
               <center>
                 <Loader type="Oval" color="#007aff" height={50} width={50} />
               </center>
-            )}
-          </div>
+            </div>
+          )}
 
           <Link href="/create">
             <a className={styles.home__create}>Create game</a>
